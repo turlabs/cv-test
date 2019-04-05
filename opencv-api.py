@@ -60,4 +60,4 @@ if status != cv.Stitcher_OK:
 cv.imwrite(args.output, pano);
 print("stitching completed successfully. %s saved!" % args.output)
 end = time.time()
-print("cost time..."+(end-start))
+print("cost time..."+str(end-start))
