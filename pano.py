@@ -1,15 +1,24 @@
-import numpy as np
+
 import cv2
 import sys
 from matchers import matchers
 import time
+import os
+import numpy as np
+from skimage import filters
+from imutils import paths
+import argparse
 
 class Stitch:
 	def __init__(self, args):
 		self.path = args
 		fp = open(self.path, 'r')
 		filenames = [each.rstrip('\r\n') for each in  fp.readlines()]
-		print (filenames)
+		# 过滤不存在图片
+		filenames = list(filter(lambda x: os.path.exists(x), filenames))
+		print(filenames)
+		#filenames = self.filter_file(filenames)
+
 		self.images = [cv2.resize(cv2.imread(each),(480, 320)) for each in filenames]
 		self.count = len(self.images)
 		self.left_list, self.right_list, self.center_im = [], [],None
@@ -27,6 +36,31 @@ class Stitch:
 			else:
 				self.right_list.append(self.images[i])
 		print ("Image lists prepared")
+
+	def variance_of_laplacian(self,image):
+		# compute the Laplacian of the image and then return the focus
+		# measure, which is simply the variance of the Laplacian
+		return cv2.Laplacian(image, cv2.CV_64F).var()
+
+	def filter_file(self,images) :
+		print ('filer...blur')
+		data = []
+		ap = argparse.ArgumentParser()
+		# ap.add_argument("-i", "--images", required=True,
+		# help="path to input directory of images") 
+		# ap.add_argument("-t", "--threshold", type=float, default=100.0,
+		# help="focus measures that fall below this value will be considered 'blurry'")
+
+		for imagePath in images:
+			image = cv2.imread(imagePath)
+			gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+			fm = self.variance_of_laplacian(gray)
+			text = "Not Blurry"
+			if fm > 100:
+				data.append(imagePath)
+		
+		return data
+			
 
 	def leftshift(self):
 		# self.left_list = reversed(self.left_list)
@@ -48,14 +82,25 @@ class Stitch:
 			offsetx = abs(int(f1[0]))
 			dsize = (int(ds[0])+offsetx, int(ds[1]) + offsety)
 			print ("image dsize =>", dsize)
+			
 			tmp = cv2.warpPerspective(a, xh, dsize)
+			tmp[offsety:b.shape[0]+offsety, offsetx:b.shape[1]+offsetx] = b
+			
 			# cv2.imshow("warped", tmp)
 			# cv2.waitKey()
-			print(b.shape[0]+offsety)
-			print(b.shape[1]+offsetx)
-			tmp[offsety:b.shape[0]+offsety, offsetx:b.shape[1]+offsetx] = b
-			#tmp = self.mix_and_match(self.leftImage, tmp)
-			a = tmp
+			#print(b.shape[0]+offsety)
+			#print(b.shape[1]+offsetx)
+			# try:
+			# 	tmp = cv2.warpPerspective(a, xh, dsize)
+			# 	tmp[offsety:b.shape[0]+offsety, offsetx:b.shape[1]+offsetx] = b
+			# 	#tmp = self.mix_and_match(self.leftImage, tmp)
+			# 	a = tmp
+			# 	pass
+			# except ValueError as identifier:
+			# 	pass
+			# finally:
+			# 	pass
+			
 
 		self.leftImage = tmp
 
@@ -153,5 +198,5 @@ if __name__ == '__main__':
 	print ("done")
 	cv2.imwrite("test12.jpg", s.leftImage)
 	print ("image written")
-	cv2.destroyAllWindows()
+	#cv2.destroyAllWindows()
 	

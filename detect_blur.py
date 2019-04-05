@@ -36,10 +36,10 @@ for imagePath in paths.list_images(args["images"]):
 		text = "Blurry"
  
 	# show the image
-	cv2.putText(image, "{}: {:.2f}".format(text, fm), (10, 30),
-		cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 3)
-	cv2.imshow("Image", image)
-	key = cv2.waitKey(0)
+	# cv2.putText(image, "{}: {:.2f}".format(text, fm), (10, 30),
+	# 	cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 3)
+	# cv2.imshow("Image", image)
+	# key = cv2.waitKey(0)
 
 
 # dir = os.listdir('/home/carvendy/dev/git/cv-test/images/')
