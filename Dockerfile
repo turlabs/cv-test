@@ -8,7 +8,7 @@ COPY sources.zh.list /etc/apt/sources.list
 # Various Python and C/build deps
 RUN apt-get update --fix-missing  && \
 #apt-get upgrade -y --fix-missing && \ 
-    apt-get install build-essential cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev  -y --fix-missing  && \
+    apt-get install build-essential cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev wget -y --fix-missing  && \
     apt-get install libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libjpeg-dev libeigen3-dev python3 python3-pip python-qt4 tzdata -y --fix-missing
 
 #RUN pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip && \
@@ -17,10 +17,10 @@ RUN pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple opencv-python Pillo
     cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 # Install Open CV - Warning, this takes absolutely forever
-RUN apt-get install wget unzip -y  && cd ~ && wget https://github.com/opencv/opencv/archive/3.4.0.zip -o opencv.zip  && unzip opencv.zip -d opencv  && \ 
+RUN cd ~ && wget https://github.com/opencv/opencv/archive/3.4.0.tar.gz -O opencv.tar.gz  && tar -xzvf opencv.tar.gz  && \ 
     cd opencv && \
-    cd ~ && wget https://github.com/opencv/opencv_contrib/archive/3.4.0.zip -o opencv_contrib.zip  && \
-    unzip opencv_contrib.zip -d opencv_contrib && cd opencv_contrib && \
+    cd ~ && wget https://github.com/opencv/opencv_contrib/archive/3.4.0.tar.gz -O opencv_contrib.tar.gz  && \
+    tar -xzvf opencv_contrib.tar.gz && cd opencv_contrib && \
     git checkout 3.4 && \
     cd ~/opencv && mkdir -p build && cd build && \
     cmake -D CMAKE_BUILD_TYPE=RELEASE \
